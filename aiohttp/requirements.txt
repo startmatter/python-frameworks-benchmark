@@ -1,0 +1,4 @@
+aiohttp==3.5.1
+asyncpg==0.18.2
+gunicorn==19.9.0
+uvloop==0.12.0

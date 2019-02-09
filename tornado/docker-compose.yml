@@ -1,0 +1,24 @@
+version: '3'
+services:
+  postgres:
+    container_name: 'postgres'
+    restart: always
+    build: .././database/
+    ports:
+      - "5432"
+    environment:
+      - POSTGRES_PASSWORD=render
+      - POSTGRES_USER=render
+      - POSTGRES_DB=render
+
+  tornado:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    environment:
+      - DATABASE_URL=postgres://render:render@postgres:5432/render

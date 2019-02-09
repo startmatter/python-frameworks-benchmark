@@ -1,0 +1,23 @@
+version: '3'
+services:
+  postgres:
+    restart: always
+    build: .././database/ 
+    environment:
+      - POSTGRES_PASSWORD=render
+      - POSTGRES_USER=render
+      - POSTGRES_DB=render
+
+  django:
+    restart: always
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres  
+    environment:
+      - ALLOWED_HOSTS=*
+      - DEBUG=''
+      - DATABASE_URL=postgres://render:render@postgres:5432/render
+      - DJANGO_SETTINGS_MODULE=django_perfomance.settings
+  
