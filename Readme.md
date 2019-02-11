@@ -32,6 +32,10 @@ To run the benchmark for current framework you should run the command:
 
 ```wrk -t12 -c400 -d30s http://127.0.0.1:8080/db```
 
+## Benchmark Results
+
+In our article we have described the test results in detail. You can read it **[here](https://blog.startmatter.com/top-fast-python-web-frameworks-in-2019/)**.
+
 ## Contributors
 
 * **[Maksim Larkin](https://github.com/maximzah)**
