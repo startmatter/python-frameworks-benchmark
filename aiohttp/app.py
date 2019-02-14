@@ -1,7 +1,6 @@
 import asyncio
 import asyncpg
 from aiohttp import web
-import os
 import uvloop
 
 
@@ -24,6 +23,11 @@ async def handle_db(request):
 async def init_app():
     """Initialize the application server."""
     app = web.Application()
-    app['db'] = await asyncpg.create_pool(dsn=os.environ['DATABASE_URL'])
+    app['db'] = await asyncpg.create_pool(dsn='postgres://render:render@localhost:5432/render')
     app.router.add_route('GET', '/db', handle_db)
     return app
+
+
+loop = asyncio.get_event_loop()
+app = loop.run_until_complete(init_app())
+web.run_app(app)
