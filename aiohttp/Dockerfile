@@ -12,4 +12,4 @@ EXPOSE 8080
 
 ENTRYPOINT ["/aiohttp/conf/docker-entrypoint.sh"]
 
-CMD ["gunicorn", "app:init_app", "-c", "/aiohttp/conf/gunicorn.conf.py"]
+CMD ["python3", "/aiohttp/app.py"]

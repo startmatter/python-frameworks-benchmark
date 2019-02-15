@@ -1,7 +1,8 @@
-import asyncio
-import asyncpg
 from aiohttp import web
+import asyncpg
+import asyncio
 import uvloop
+import os
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -23,7 +24,7 @@ async def handle_db(request):
 async def init_app():
     """Initialize the application server."""
     app = web.Application()
-    app['db'] = await asyncpg.create_pool(dsn='postgres://render:render@localhost:5432/render')
+    app['db'] = await asyncpg.create_pool(dsn=os.environ['DATABASE_URL'])
     app.router.add_route('GET', '/db', handle_db)
     return app
 
