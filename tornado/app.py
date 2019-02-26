@@ -1,11 +1,11 @@
 from tornado.ioloop import IOLoop
 from tornado.httpserver import HTTPServer
-from tornado.options import parse_command_line
-from tornado import web, gen
-import momoko
+from tornado import web
+from functools import partial
 import os
 import asyncio
 import uvloop
+import asyncpg
 
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -17,33 +17,32 @@ class BaseHandler(web.RequestHandler):
         return self.application.db
 
 
-class DB(BaseHandler):
-    @gen.coroutine
-    def get(self):
-        cursor = yield self.db.execute("SELECT html FROM render_cache_pagehtml WHERE url='startmatter.com'")
-        self.write(cursor.fetchone()[0])
-        self.finish()
+class DBHandler(BaseHandler):
+    async def get(self):
+        async with self.db.acquire() as connection:
+            result = await connection.fetchval("SELECT html FROM render_cache_pagehtml WHERE url='startmatter.com'")
+        self.write(result)
+
+
+async def init_db():
+    return await asyncpg.create_pool(dsn=os.environ['DATABASE_URL'])
 
 
 def make_app():
     application = web.Application([
-        (r'/db', DB)
-    ], debug=True)
-    ioloop = IOLoop.instance()
+        (r'/db', DBHandler)
+    ])
 
-    application.db = momoko.Pool(
-        dsn=os.environ['DATABASE_URL'],
-        ioloop=ioloop,
-    )
+    uvloop.install()
 
-    future = application.db.connect()
-    ioloop.add_future(future, lambda f: ioloop.stop())
+    server = HTTPServer(application)
+    server.listen(8080, '0.0.0.0')
+
+    ioloop = IOLoop.current()
+    application.db = ioloop.run_sync(partial(init_db))
+
     ioloop.start()
-    future.result()  # raises exception on connection error
 
-    http_server = HTTPServer(application)
-    http_server.listen(8080, '0.0.0.0')
-    ioloop.start()
     return application
 
 

@@ -1,6 +1,4 @@
-Momoko==2.2.5.1
-psycopg2==2.7.6.1
+asyncpg==0.18.2
 tornado==5.1.1
-psycopg2-binary
 gunicorn==19.9.0
 uvloop==0.12.0
